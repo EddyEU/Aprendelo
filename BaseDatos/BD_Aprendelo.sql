@@ -14,7 +14,7 @@ CREATE TABLE casodeuso
 (
 id int Primary key,
 nombre varchar(20) not null,
-posicion varchar(10),
+posicion int not null,
 idModulo int not null,
 Foreign key(idModulo) references modulo(id)
 );
@@ -82,6 +82,7 @@ id int Primary key,
 nombre varchar(50) not null,
 descripcion varchar(150) not null,
 concluido bit default 0,
+estado bit default 1,
 idPersona int not null,
 Foreign key(idPersona) references persona(id)
 );
@@ -93,6 +94,7 @@ id int Primary key,
 titulo varchar(50) not null,
 aprobado bit default 0,
 habilitado bit default 0,
+estado bit default 1,
 idCurso int not null,
 Foreign key(idCurso) references curso(id)
 on update cascade
@@ -124,6 +126,7 @@ titulo varchar(50) not null,
 contenido varchar(max) not null,
 aprobado bit default 0,
 habilitado bit default 0,
+estado bit default 1,
 puntaje int ,
 Foreign key(idNodo) references nodo(id)
 on update cascade
@@ -157,6 +160,7 @@ id int Primary key,
 descripcion varchar(20) not null,
 idTipo int not null,
 idSubnodo int not null,
+estado bit default 1,
 Foreign key(idTipo) references tipopregunta(id)
 on update cascade
 on delete cascade,
@@ -174,6 +178,5 @@ nombre varchar(15) not null
 
 
 --------------Inserciones -----------------
-
 
 
