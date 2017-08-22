@@ -1,182 +1,184 @@
 CREATE DATABASE NodosCognitivos;
+
 USE NodosCognitivos;
 
---Modulo / paquetes de los Casos de Uso
-CREATE TABLE modulo
+
+CREATE TABLE MODULO
 (
-id int Primary key,
-nombre varchar(20) not null
+ID INT PRIMARY KEY,
+NOMBRE VARCHAR(20) NOT NULL
 );
 
 
--- Casos de Uso
-CREATE TABLE casodeuso
+CREATE TABLE CU
 (
-id int Primary key,
-nombre varchar(20) not null,
-posicion int not null,
-idModulo int not null,
-Foreign key(idModulo) references modulo(id)
-);
-
--- Detalle Caso de Uso con Cargos
-CREATE TABLE detalle_casoUso
-(
-idDeta int not null,
-idCu int not null,
-primary key(idCu,idDeta),
-idCargo int not null,
-foreign key(idCu) references casodeuso(id),
-foreign key(idCargo) references cargo(id)
-);
-
---cargos / privilegios
-CREATE TABLE cargo
-(
-id int Primary key,
-nombre varchar(20) not null
-);
-
---bitacora del administrativo
-CREATE TABLE bitacora
-(
-id int Primary key,
-inicio date not null,
-fin date not null,
-cargo int not null
-);
-
--- detalle bitacora
-CREATE TABLE detalle_bitacora
-(
-idBit int not null,
-idDetalle int not null,
-Primary key(idBit,idDetalle),
-accion varchar(50) not null,
-hora datetime not null,
-tabla varchar(50) not null,
-Foreign key(idBit) references bitacora(id)
-on update cascade
-on delete cascade
-);
-
---usuario principal
-CREATE TABLE persona
-(
-id int Primary key,
-pass varchar(10) not null,
-nombre varchar(50) not null,
-nick varchar(15) not null,
-estado bit default 1,
-idCargo int not null,
-Foreign key(idCargo) references cargo(id),
-idBit int not null,
-Foreign key(idBit) references bitacora(id)
-
-);
-
---cursos creados
-CREATE TABLE curso
-(
-id int Primary key,
-nombre varchar(50) not null,
-descripcion varchar(150) not null,
-concluido bit default 0,
-estado bit default 1,
-idPersona int not null,
-Foreign key(idPersona) references persona(id)
-);
-
---Nodo principal
-CREATE TABLE nodo
-(
-id int Primary key,
-titulo varchar(50) not null,
-aprobado bit default 0,
-habilitado bit default 0,
-estado bit default 1,
-idCurso int not null,
-Foreign key(idCurso) references curso(id)
-on update cascade
-on delete cascade
-);
-
----Prerequisito de Nodo
-CREATE TABLE prereq
-(
-idNodo int not null,
-idPre int not null,
-Primary key(idNodo,idPre)
-);
-
-alter table prereq
-add Foreign key(idNodo) references nodo(id)
-on update no action on delete no action;
-alter table prereq
-add foreign key (idPre) references nodo(id)
-on update no action on delete no action;
-
-
---Subnodos dentro del nodo principal
-CREATE TABLE subnodo
-(
-id int Primary key,
-idNodo int not null,
-titulo varchar(50) not null,
-contenido varchar(max) not null,
-aprobado bit default 0,
-habilitado bit default 0,
-estado bit default 1,
-puntaje int ,
-Foreign key(idNodo) references nodo(id)
-on update cascade
-on delete cascade
+ID INT PRIMARY KEY,
+NOMBRE VARCHAR(20) NOT NULL,
+POSICION VARCHAR(10),
+ID_MODULO INT NOT NULL,
+FOREIGN KEY(ID_MODULO) REFERENCES MODULO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
 );
 
 
--- Respuesta de la Pregunta
-CREATE TABLE respuesta
+CREATE TABLE CARGO
 (
-idResp int not null,
-idPre int not null,
-Primary key(idPre, idResp),
-descripcion varchar(20) not null,
-aprobado bit default 0,
-comentario varchar(15) not null,
-idSubnodo int not null,
-Foreign key(idPre) references pregunta(id)
-on update cascade 
-on delete cascade, 
-Foreign key(idSubnodo) references subnodo(id)
-on update no action
-on delete no action
-
-);
-
---REtroalimentacion del nodo
-CREATE TABLE pregunta
-(
-id int Primary key,
-descripcion varchar(20) not null,
-idTipo int not null,
-idSubnodo int not null,
-estado bit default 1,
-Foreign key(idTipo) references tipopregunta(id)
-on update cascade
-on delete cascade,
-Foreign key(idSubnodo) references subnodo(id)
-on update cascade
-on delete cascade
-);
-
----Tipo de Pregunta (seleccion multiple, escribir, etc)
-CREATE TABLE tipopregunta
-(
-id int Primary key,
-nombre varchar(15) not null
+ID INT PRIMARY KEY,
+NOMBRE VARCHAR(20) NOT NULL,
+DESCRIPCION VARCHAR(100) NOT NULL
 );
 
 
---------------Inserciones -----------------
+CREATE TABLE DETALLE_CU
+(
+ID INT NOT NULL,
+ID_CU INT NOT NULL,
+PRIMARY KEY(ID_CU,ID),
+IDCARGO INT NOT NULL,
+HABILITADO BIT(1)  DEFAULT 1,
+FOREIGN KEY(ID_CU) REFERENCES CU(ID),
+FOREIGN KEY(IDCARGO) REFERENCES CARGO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
 
 
+CREATE TABLE PERSONA
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+PASS VARCHAR(10) NOT NULL,
+NOMBRE VARCHAR(50) NOT NULL,
+NICK VARCHAR(15) NOT NULL,
+EMAIL VARCHAR(50) NOT NULL,
+ESTADO BIT(1) DEFAULT 1,
+IDCARGO INT NOT NULL,
+FOREIGN KEY(IDCARGO) REFERENCES CARGO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+
+CREATE TABLE BITACORA
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+INICIO DATETIME NOT NULL,
+FIN DATETIME NOT NULL,
+ID_PERSONA INT NOT NULL,
+FOREIGN KEY(ID_PERSONA) REFERENCES PERSONA(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+CREATE TABLE DETALLE_BITACORA
+(
+ID INT NOT NULL,
+ID_BITACORA INT NOT NULL,
+ACCION VARCHAR(50) NOT NULL,
+HORA DATETIME NOT NULL,
+TABLA VARCHAR(50) NOT NULL,
+PRIMARY KEY(ID_BITACORA,ID),
+FOREIGN KEY(ID_BITACORA) REFERENCES BITACORA(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+CREATE TABLE CURSO
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+NOMBRE VARCHAR(50) NOT NULL,
+DESCRIPCION VARCHAR(150) NOT NULL,
+CONCLUIDO BIT(1) DEFAULT 0,
+PUNTAJE INT NOT NULL,
+ID_PERSONA INT NOT NULL,
+ESTADO BIT(1) DEFAULT 1,
+FOREIGN KEY(ID_PERSONA) REFERENCES PERSONA(ID)
+);
+
+
+CREATE TABLE NODO
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+TITULO VARCHAR(50) NOT NULL,
+DESCRIPCION VARCHAR(255) NOT NULL,
+APROBADO BIT(1) DEFAULT 0,
+HABILITADO BIT(1) DEFAULT 0,
+ID_CURSO INT NOT NULL,
+ESTADO BIT(1) DEFAULT 1,
+FOREIGN KEY(ID_CURSO) REFERENCES CURSO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+
+CREATE TABLE PRE
+(
+ID_NODO INT NOT NULL,
+ID_PRE INT NOT NULL,
+PRIMARY KEY(ID_PRE,ID_NODO)
+);
+ALTER TABLE PRE
+ADD FOREIGN KEY(ID_NODO) REFERENCES NODO(ID)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE PRE
+ADD FOREIGN KEY (ID_PRE) REFERENCES NODO(ID)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+CREATE TABLE SUBNODO
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+ID_NODO INT NOT NULL,
+TITULO VARCHAR(50) NOT NULL,
+CONTENIDO TEXT NOT NULL,
+APROBADO BIT(1) DEFAULT 0,
+HABILITADO BIT(1) DEFAULT 0,
+PUNTAJE INT,
+ESTADO BIT(1) DEFAULT 1,
+FOREIGN KEY(ID_NODO) REFERENCES NODO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+
+CREATE TABLE TIPO_PREGUNTA
+(
+ID INT PRIMARY KEY,
+NOMBRE VARCHAR(15) NOT NULL
+);
+
+
+CREATE TABLE PREGUNTA
+(
+ID INT PRIMARY KEY AUTO_INCREMENT,
+DESCRIPCION VARCHAR(20) NOT NULL,
+PUNTAJE INT NOT NULL,
+ID_TIPO INT NOT NULL,
+ID_SUBNODO INT NOT NULL,
+ESTADO BIT(1) DEFAULT 1,
+FOREIGN KEY(ID_TIPO) REFERENCES TIPO_PREGUNTA(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE,
+FOREIGN KEY(ID_SUBNODO) REFERENCES SUBNODO(ID)
+ON UPDATE CASCADE
+ON DELETE CASCADE
+);
+
+
+CREATE TABLE RESPUESTA
+(
+ID INT NOT NULL,
+ID_PREGUNTA INT NOT NULL,
+PRIMARY KEY(ID_PREGUNTA, ID),
+DESCRIPCION VARCHAR(20) NOT NULL,
+APROBADO BIT(1) DEFAULT 0,
+COMENTARIO VARCHAR(15) NOT NULL,
+ID_SUBNODO INT NOT NULL,
+ESTADO BIT(1) DEFAULT 1,
+FOREIGN KEY(ID_PREGUNTA) REFERENCES PREGUNTA(ID)
+ON UPDATE CASCADE 
+ON DELETE CASCADE, 
+FOREIGN KEY(ID_SUBNODO) REFERENCES SUBNODO(ID)
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+);
