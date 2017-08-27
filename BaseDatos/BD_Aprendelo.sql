@@ -1,21 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.5.1
--- http://www.phpmyadmin.net
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 26-08-2017 a las 19:26:33
--- Versión del servidor: 10.1.16-MariaDB
--- Versión de PHP: 5.6.24
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Base de datos: `nodoscognitivos`
 --
@@ -76,6 +58,7 @@ CREATE TABLE `curso` (
   `ID` int(11) NOT NULL,
   `NOMBRE` varchar(50) NOT NULL,
   `DESCRIPCION` varchar(150) NOT NULL,
+  `HABILITADO` bit(1) NOT NULL DEFAULT b'0',
   `CONCLUIDO` bit(1) DEFAULT b'0',
   `PUNTAJE` int(11) DEFAULT NULL,
   `ID_PERSONA` int(11) NOT NULL,
@@ -86,10 +69,11 @@ CREATE TABLE `curso` (
 -- Volcado de datos para la tabla `curso`
 --
 
-INSERT INTO `curso` (`ID`, `NOMBRE`, `DESCRIPCION`, `CONCLUIDO`, `PUNTAJE`, `ID_PERSONA`, `ESTADO`) VALUES
-(1, 'Introducción a la informática', 'Materia del primer semestre. Sumamente esencial para las carreras de ciencias de la computación.', b'0', NULL, 4, b'1'),
-(2, 'Cálculo I', 'Materia del primer semestre de todas las carreras relacionadas con ingeniería.', b'0', NULL, 4, b'1'),
-(4, 'Sistemas de información I', 'Materia importante de las carreras de Informática y Sistemas.', b'0', NULL, 4, b'1');
+INSERT INTO `curso` (`ID`, `NOMBRE`, `DESCRIPCION`, `HABILITADO`, `CONCLUIDO`, `PUNTAJE`, `ID_PERSONA`, `ESTADO`) VALUES
+(1, 'Introducción a la informática', 'Materia del primer semestre. Sumamente esencial para las carreras de ciencias de la computación.', b'0', b'0', NULL, 4, b'1'),
+(2, 'Cálculo I', 'Materia del primer semestre de todas las carreras relacionadas con ingeniería.', b'0', b'0', NULL, 4, b'1'),
+(4, 'Sistemas de información I', 'Materia importante de las carreras de Informática y Sistemas.', b'0', b'0', NULL, 4, b'1'),
+(5, 'Base de datos I', 'Ing. Veizaga', b'0', b'0', NULL, 4, b'1');
 
 -- --------------------------------------------------------
 
@@ -142,17 +126,22 @@ CREATE TABLE `nodo` (
   `APROBADO` bit(1) DEFAULT b'0',
   `HABILITADO` bit(1) DEFAULT b'0',
   `ID_CURSO` int(11) NOT NULL,
-  `ESTADO` bit(1) DEFAULT b'1'
+  `ESTADO` bit(1) DEFAULT b'1',
+  `RAIZ` bit(1) NOT NULL DEFAULT b'0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `nodo`
 --
 
-INSERT INTO `nodo` (`ID`, `TITULO`, `DESCRIPCION`, `APROBADO`, `HABILITADO`, `ID_CURSO`, `ESTADO`) VALUES
-(1, 'Sistemas de representación de la información', 'Unidad la cual contiene "Sistemas de numeración" y "Representación de la información".', b'0', b'0', 1, b'1'),
-(2, 'Fundamentos de programación', 'Unidad en la que se describe  la metodología de resolución de problemas y los métodos y técnicas de programación.', b'0', b'0', 1, b'1'),
-(3, 'Desarrollo de algoritmos', 'Unidad en la cual se desarrollarán algoritmos para dar solución a problemas específicos\r\nmediante el uso de Estructuras, Procesos y las herramientas para\r\nsimbolizar soluciones.', b'0', b'0', 1, b'1');
+INSERT INTO `nodo` (`ID`, `TITULO`, `DESCRIPCION`, `APROBADO`, `HABILITADO`, `ID_CURSO`, `ESTADO`, `RAIZ`) VALUES
+(1, 'Sistemas de representación de la información', 'Unidad la cual contiene Sistemas de numeración y Representación de la información.', b'0', b'0', 1, b'1', b'0'),
+(2, 'Fundamentos de programación', 'Unidad en la que se describe la metodología de resolución de problemas y los métodos y técnicas de programación.', b'0', b'0', 1, b'1', b'0'),
+(3, 'Desarrollo de algoritmos', 'Unidad en la cual se desarrollarán algoritmos para dar solución a problemas específicos mediante el uso de Estructuras, Procesos y las herramientas para simbolizar soluciones.', b'0', b'0', 1, b'1', b'0'),
+(8, 'Teoría General de Sistemas (TGS)', 'Unidad del diablo', b'0', b'1', 4, b'1', b'1'),
+(9, 'Derivadas', 'Anti-integrales', b'0', b'1', 2, b'0', b'1'),
+(10, 'Introducción al diseño de Bases de Datos', 'Primer tema de la materia, Base de Datos I.', b'0', b'1', 5, b'1', b'1'),
+(11, 'Paradigmas de desarrollo de sotware', 'Segundo tema de SI.', b'0', b'0', 4, b'1', b'0');
 
 -- --------------------------------------------------------
 
@@ -163,22 +152,24 @@ INSERT INTO `nodo` (`ID`, `TITULO`, `DESCRIPCION`, `APROBADO`, `HABILITADO`, `ID
 CREATE TABLE `persona` (
   `ID` int(11) NOT NULL,
   `PASS` varchar(10) NOT NULL,
+  `CI` varchar(15) NOT NULL,
   `NOMBRE` varchar(50) NOT NULL,
   `NICK` varchar(15) NOT NULL,
   `EMAIL` varchar(50) NOT NULL,
   `ESTADO` bit(1) DEFAULT b'1',
-  `IDCARGO` int(11) NOT NULL
+  `IDCARGO` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `persona`
 --
 
-INSERT INTO `persona` (`ID`, `PASS`, `NOMBRE`, `NICK`, `EMAIL`, `ESTADO`, `IDCARGO`) VALUES
-(1, '123', 'Genaro Alvarez', 'Naro', 'naroalvarez97@gmail.com', b'1', 1),
-(3, '123', 'Natalia Oviedo', 'Naty', 'natalia_o_95@hotmail.com', b'1', 1),
-(4, '123', 'Eddy Escalante', 'Eddy', 'eddy,escalante.u@hotmail.com', b'1', 2),
-(5, '123', 'Joaquin Chumacero', 'Chumi', 'joaquinchuma@gmail.com', b'1', 2);
+INSERT INTO `persona` (`ID`, `PASS`, `CI`, `NOMBRE`, `NICK`, `EMAIL`, `ESTADO`, `IDCARGO`) VALUES
+(1, '123', '8460428 LP', 'Genaro Alvarez', 'Naro', 'naroalvarez97@gmail.com', b'1', 1),
+(3, '123', '', 'Natalia Oviedo', 'Naty', 'natalia_o_95@hotmail.com', b'1', 1),
+(4, '123', '', 'Eddy Escalante', 'Eddy', 'eddy,escalante.u@hotmail.com', b'1', 2),
+(5, '123', '', 'Joaquin Chumacero', 'Chumi', 'joaquinchuma@gmail.com', b'1', 2),
+(6, '8460428 SC', '8460428 SC', 'Pedro Gutierrez', 'Pedro', 'pedro@gmail.com', b'1', NULL);
 
 -- --------------------------------------------------------
 
@@ -370,17 +361,17 @@ ALTER TABLE `bitacora`
 -- AUTO_INCREMENT de la tabla `curso`
 --
 ALTER TABLE `curso`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT de la tabla `nodo`
 --
 ALTER TABLE `nodo`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT de la tabla `persona`
 --
 ALTER TABLE `persona`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT de la tabla `pregunta`
 --
